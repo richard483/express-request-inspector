@@ -1,0 +1,16 @@
+{
+  "name": "request-inspector-app",
+  "version": "1.0.0",
+  "description": "A simple Node.js app to inspect all HTTP requests and provide rule-based responses.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "sequelize": "^6.37.3",
+    "pg": "^8.12.0",
+    "pg-hstore": "^2.3.4",
+    "dotenv": "^16.4.5"
+  }
+}
