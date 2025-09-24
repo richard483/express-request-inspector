@@ -29,6 +29,97 @@ const rules = [
     }
 ];
 
+// --- NEW: Route to display last N requests in HTML table ---
+app.get('/last-:number', async (req, res) => {
+    try {
+        const number = parseInt(req.params.number, 10);
+
+        // Validate the number parameter
+        if (isNaN(number) || number <= 0) {
+            return res.status(400).send('<h1>Error: Invalid number. Please provide a positive integer.</h1>');
+        }
+
+        // Fetch the last N requests from the database
+        const lastRequests = await RequestLog.findAll({
+            order: [['createdAt', 'DESC']],
+            limit: number
+        });
+
+        // Generate HTML table
+        let html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Last ${number} Requests</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                tr:nth-child(even) { background-color: #f9f9f9; }
+                .json-data { max-width: 300px; word-wrap: break-word; font-size: 12px; }
+                .timestamp { white-space: nowrap; }
+            </style>
+        </head>
+        <body>
+            <h1>Last ${number} Request${number > 1 ? 's' : ''}</h1>
+            <p>Total found: ${lastRequests.length}</p>
+        `;
+
+        if (lastRequests.length === 0) {
+            html += '<p>No requests found in the database.</p>';
+        } else {
+            html += `
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Timestamp</th>
+                        <th>Method</th>
+                        <th>Path</th>
+                        <th>Headers</th>
+                        <th>Body</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+            lastRequests.forEach(request => {
+                const timestamp = new Date(request.createdAt).toLocaleString();
+                const headers = JSON.stringify(request.headers, null, 2);
+                const body = request.body ? JSON.stringify(request.body, null, 2) : 'N/A';
+
+                html += `
+                    <tr>
+                        <td>${request.id}</td>
+                        <td class="timestamp">${timestamp}</td>
+                        <td>${request.method}</td>
+                        <td>${request.path}</td>
+                        <td class="json-data"><pre>${headers}</pre></td>
+                        <td class="json-data"><pre>${body}</pre></td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                </tbody>
+            </table>
+            `;
+        }
+
+        html += `
+        </body>
+        </html>
+        `;
+
+        res.send(html);
+
+    } catch (error) {
+        console.error('❌ Error fetching request logs:', error);
+        res.status(500).send('<h1>Error: Unable to fetch request logs from database.</h1>');
+    }
+});
+
 // The "catch-all" handler is now an ASYNC function
 app.all('*', async (req, res) => { // <-- MADE ASYNC
     // --- 1. Print request details to the terminal (Unchanged) ---
