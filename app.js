@@ -56,8 +56,9 @@ app.get('/last-:number', async (req, res) => {
                 table { border-collapse: collapse; width: 100%; margin-top: 20px; }
                 th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
                 th { background-color: #f2f2f2; }
+                pre {overflow-x: scroll;}
                 tr:nth-child(even) { background-color: #f9f9f9; }
-                .json-data { max-width: 300px; word-wrap: break-word; font-size: 12px; }
+                .json-data { max-width: 360px; word-wrap: break-word; font-size: 12px; }
                 .timestamp { white-space: nowrap; }
             </style>
         </head>
