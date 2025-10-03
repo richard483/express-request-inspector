@@ -5,4 +5,5 @@ KubePipeline() {
 	projectName = "express-request-inspector"
 	appPort = "3000"
     externalEndpointsIp = "10.10.10.23"
+	kubeNodePort = "30023"
 }
